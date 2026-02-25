@@ -50,12 +50,6 @@ spec:
                 name: llm-config
                 key: OPENAI_URL
                 optional: true
-          - name: MODEL
-            valueFrom:
-              secretKeyRef:
-                name: llm-config
-                key: MODEL
-                optional: true
           - name: OLLAMA_MODEL
             valueFrom:
               secretKeyRef:
@@ -145,18 +139,6 @@ spec:
               secretKeyRef:
                 name: llm-config
                 key: AWS_REGION
-                optional: true
-          - name: AWS_SECRET_ACCESS_KEY
-            valueFrom:
-              secretKeyRef:
-                name: llm-config
-                key: AWS_SECRET_ACCESS_KEY
-                optional: true
-          - name: AWS_ACCESS_KEY_ID
-            valueFrom:
-              secretKeyRef:
-                name: llm-config
-                key: AWS_ACCESS_KEY_ID
                 optional: true
           - name: DB_ENABLED
             value: "{{ .Values.storage.enabled }}"
