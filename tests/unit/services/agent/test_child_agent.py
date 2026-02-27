@@ -8,6 +8,7 @@ import pytest
 from unittest.mock import MagicMock
 from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
 from langgraph.graph import END
+from langgraph.checkpoint.memory import InMemorySaver
 from app.services.agent.base import BaseAgentBuilder
 from app.services.agent.child import ChildAgentBuilder, create_child_agent
 from app.services.agent.loader import AgentConfig, AuthenticationType
@@ -41,7 +42,7 @@ def mock_tools():
 @pytest.fixture
 def mock_checkpointer():
     """Mock checkpointer for state persistence."""
-    return MagicMock()
+    return InMemorySaver()
 
 
 @pytest.fixture

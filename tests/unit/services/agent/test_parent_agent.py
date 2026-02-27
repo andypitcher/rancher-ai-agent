@@ -5,6 +5,7 @@ Tests the creation and behavior of parent agents that route requests to speciali
 """
 import pytest
 from unittest.mock import MagicMock, patch
+from langgraph.checkpoint.memory import InMemorySaver
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 from langgraph.types import Command
 from app.services.agent.parent import ParentAgentBuilder, ChildAgent, create_parent_agent
@@ -75,7 +76,7 @@ def mock_child_agents(mock_child_agent_graph):
 @pytest.fixture
 def mock_checkpointer():
     """Mock checkpointer for state persistence."""
-    return MagicMock()
+    return InMemorySaver()
 
 
 @pytest.fixture

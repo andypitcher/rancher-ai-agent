@@ -5,6 +5,7 @@ Tests the creation and behavior of root agents that run independently without a 
 """
 import pytest
 from unittest.mock import MagicMock
+from langgraph.checkpoint.memory import InMemorySaver
 from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
 from langgraph.graph import END
 from app.services.agent.base import BaseAgentBuilder
@@ -40,7 +41,7 @@ def mock_tools():
 @pytest.fixture
 def mock_checkpointer():
     """Mock checkpointer for state persistence."""
-    return MagicMock()
+    return InMemorySaver()
 
 
 @pytest.fixture
