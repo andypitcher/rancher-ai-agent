@@ -7,9 +7,9 @@ import (
 
 // AIAgentConfigSpec defines the desired state of AIAgentConfig
 type AIAgentConfigSpec struct {
-	// Name is the name of the AI agent
+	// DisplayName is the name of the AI agent
 	// +kubebuilder:validation:Required
-	Name string `json:"name"`
+	DisplayName string `json:"displayName"`
 
 	// Description provides details about the agent's purpose
 	// +optional
@@ -42,23 +42,11 @@ type AIAgentConfigSpec struct {
 
 	// HumanValidationTools lists tools requiring human validation
 	// +optional
-	HumanValidationTools []HumanValidationTool `json:"humanValidationTools,omitempty"`
+	HumanValidationTools []string `json:"humanValidationTools,omitempty"`
 
 	// ToolSet specifies a predefined set of tools for the agent
 	// +optional
 	ToolSet string `json:"toolSet,omitempty"`
-}
-
-// HumanValidationTool defines a tool that requires human confirmation
-type HumanValidationTool struct {
-	// Name of the tool
-	// +kubebuilder:validation:Required
-	Name string `json:"name"`
-
-	// Type of validation (CREATE, UPDATE, DELETE)
-	// +kubebuilder:validation:Enum=CREATE;UPDATE;DELETE
-	// +kubebuilder:validation:Required
-	Type string `json:"type"`
 }
 
 // AIAgentConfigStatus defines the observed state of AIAgentConfig
