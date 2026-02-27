@@ -169,6 +169,10 @@ You are a highly specialized Assistant. Your primary goal is to provide accurate
         response.additional_kwargs["request_id"] = config["configurable"]["request_id"]
         response.additional_kwargs["selected_agent"] = state.get("selected_agent", {})
 
+        if response.invalid_tool_calls:
+            logging.error(f"model response contained invalid tool calls: {response.invalid_tool_calls}")
+            raise ValueError(f"model response contained invalid tool calls: {response.invalid_tool_calls}")
+
         logging.debug("model call finished")
 
         return {"messages": [response]}
