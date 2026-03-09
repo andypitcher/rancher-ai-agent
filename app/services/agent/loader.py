@@ -205,7 +205,11 @@ def _create_default_ai_agent_config_crds(api: client.CustomObjectsApi):
                 "humanValidationTools": [
                     "createKubernetesResource", 
                     "patchKubernetesResource",
-                    "createProject"
+                    "createProject",
+                    "createImportedCluster",
+                    "createImportedCluster",
+                    "scaleClusterNodePool",
+                    "createK3kCluster",
                 ]
             }
         }
