@@ -1,13 +1,13 @@
 aiAgent:
   image:
     repository: ghcr.io/rancher/rancher-ai-agent
-    tag: v0.1.2-alpha.30
+    tag: v1.0.0-rc.1
     pullPolicy: IfNotPresent
 mcp:
   readOnly: false
   image:
     repository: ghcr.io/rancher/rancher-ai-mcp
-    tag: v0.1.2-alpha.8
+    tag: v1.0.0-rc.1
     pullPolicy: IfNotPresent
 
 ollamaLlmModel: ""
