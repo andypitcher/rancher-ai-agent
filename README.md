@@ -106,7 +106,7 @@ helm repo update
 Install the agent chart into a new namespace using the values.yaml file you created.
 
 ```bash
-helm install rancher-ai-agent rancher-ai/agent \
+helm install rancher-ai-agent rancher-ai/rancher-ai-agent \
   --namespace cattle-ai-agent-system \
   --create-namespace \
   --devel \
