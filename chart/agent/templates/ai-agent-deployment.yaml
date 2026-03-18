@@ -19,9 +19,26 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+        # If seLinux.enabled is set to true in values.yaml, the container will run as type rancher_aiagent_container_t.
+        # Note: https://github.com/rancher/rancher-selinux policy should be installed.
+        {{- if .Values.seLinux.enabled }}
+        seLinuxOptions:
+          type: rancher_aiagent_container_t
+        {{- end }}
       serviceAccountName: agent-sa
-      {{- if or (not .Values.insecureSkipTls) .Values.rag.pvc }}
       volumes:
+      - name: tmp-dir
+        emptyDir: {}
+      - name: cert-dir
+        emptyDir: {}
+      {{- if or (not .Values.insecureSkipTls) .Values.rag.pvc }}
       {{- if not .Values.insecureSkipTls }}
       - name: mcp-ca-volume
         secret:
@@ -37,6 +54,13 @@ spec:
       - image: "{{ template "system_default_registry" . }}{{ .Values.aiAgent.image.repository }}:{{ .Values.aiAgent.image.tag }}"
         imagePullPolicy: "{{ .Values.aiAgent.image.pullPolicy }}"
         name: agent
+        securityContext:
+          allowPrivilegeEscalation: false
+          privileged: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop:
+              - ALL
         env:
           - name: OPENAI_API_KEY
             valueFrom:
@@ -151,15 +175,19 @@ spec:
             path: /v1/api/readiness
             port: 8000
           {{ toYaml .Values.probes.readiness | nindent 10 }}
-        {{- if or (not .Values.insecureSkipTls) .Values.rag.pvc }}
         volumeMounts:
+        - name: tmp-dir
+          mountPath: /tmp
+        - name: cert-dir
+          mountPath: /cert
+        {{- if or (not .Values.insecureSkipTls) .Values.rag.pvc }}
         {{- if not .Values.insecureSkipTls }}
-          - name: mcp-ca-volume
-            mountPath: /etc/tls
-            readOnly: true
+        - name: mcp-ca-volume
+          mountPath: /etc/tls
+          readOnly: true
         {{- end }}
         {{- if .Values.rag.pvc }}
-          - name: rag-storage
-            mountPath: /app/rag
+        - name: rag-storage
+          mountPath: /app/rag
         {{- end }}
         {{- end }}
