@@ -1,48 +1,38 @@
-name: Publish Helm Chart
+name: Publish Docker Image
 
 on:
   push:
     tags:
       - "v*"
 
-env:
-  REGISTRY: ghcr.io
-  CHART_PATH: ./chart/agent
-
 jobs:
-  release:
+  build-and-push:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      packages: write
+      id-token: write 
+
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name : "Read vault secrets"
+        uses : rancher-eio/read-vault-secrets@main
         with:
-          fetch-depth: 0
+          secrets: |
+            secret/data/github/repo/${{ github.repository }}/rancher-prime-stg-registry/credentials registry | STAGING_PRIME_REGISTRY ;
+            secret/data/github/repo/${{ github.repository }}/rancher-prime-stg-registry/credentials username | STAGING_PRIME_REGISTRY_USERNAME ;
+            secret/data/github/repo/${{ github.repository }}/rancher-prime-stg-registry/credentials password | STAGING_PRIME_REGISTRY_PASSWORD ;
 
-      - name: Get version from Git tag
-        id: get_version
-        run: echo "VERSION=${GITHUB_REF_NAME#v}" >> $GITHUB_ENV
-
-      - name: Update Chart.yaml with new version
-        run: |
-          echo "Updating chart to version ${{ env.VERSION }}"
-          sed -i "s/^version: .*/version: ${{ env.VERSION }}/" ${{ env.CHART_PATH }}/Chart.yaml
-          sed -i "s/^appVersion: .*/appVersion: \"${{ env.VERSION }}\"/" ${{ env.CHART_PATH }}/Chart.yaml
-
-          echo "--- Chart.yaml after update ---"
-          cat ${{ env.CHART_PATH }}/Chart.yaml
-          echo "------------------------------"
-
-      - name: Install Helm
-        uses: azure/setup-helm@v4
-
-      - name: Log in to GHCR
-        run: echo "${{ secrets.GITHUB_TOKEN }}" | helm registry login ${{ env.REGISTRY }} -u ${{ github.actor }} --password-stdin
-
-      - name: Package Helm chart
-        run: helm package ${{ env.CHART_PATH }} --destination .helm-packages
-
-      - name: Push chart to GHCR OCI registry
-        run: helm push .helm-packages/rancher-ai-agent-${{ env.VERSION }}.tgz oci://${{ env.REGISTRY }}/${{ github.repository }}/charts
+        # This encapsulates: login, qemu, build/push
+      - name: Build and push image
+        uses: rancher/ecm-distro-tools/actions/publish-image@master
+        with:
+          image: rancher-ai-agent
+          tag: ${{ github.ref_name }}
+          push-to-prime: true
+          push-to-public: false
+          prime-registry: ${{ env.STAGING_PRIME_REGISTRY }}
+          prime-repo: rancher
+          prime-username: ${{ env.STAGING_PRIME_REGISTRY_USERNAME }}
+          prime-password: ${{ env.STAGING_PRIME_REGISTRY_PASSWORD }}
