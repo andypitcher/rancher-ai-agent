@@ -1,5 +1,3 @@
-> :warning: Warning! This project is in its very early stages of development. Expect frequent changes and potential breaking updates as we iterate on features and architecture.
-
 # AI Assistant for Rancher
 
 ## Architecture
