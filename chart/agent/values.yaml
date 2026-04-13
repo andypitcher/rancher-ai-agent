@@ -53,6 +53,8 @@ probes:
     timeoutSeconds: 5
     failureThreshold: 2
 insecureSkipTls: false
+seLinux:
+  enabled: false
 llmMock:
   enabled: false
   url: ""
