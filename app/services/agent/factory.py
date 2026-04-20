@@ -5,7 +5,7 @@ from datetime import datetime, timezone
 import httpx
 from kubernetes import client, config
 from .root import create_root_agent
-from .loader import AuthenticationType, load_agent_configs, AgentConfig, get_basic_auth_credentials
+from .loader import AuthenticationType, load_agent_configs, AgentConfig, get_basic_auth_credentials, get_header_auth_headers
 from .child import create_child_agent
 from .parent import create_parent_agent, ChildAgent
 from fastapi import  WebSocket
@@ -168,6 +168,13 @@ def create_mcp_client(agent_config: AgentConfig, websocket: WebSocket | None = N
             }
         except Exception as e:
             logging.error(f"Failed to get basic auth credentials: {str(e)}")
+
+    elif agent_config.authentication == AuthenticationType.HEADER:
+        mcp_url = agent_config.mcp_url
+        try:
+            headers = get_header_auth_headers(agent_config.authentication_secret)
+        except Exception as e:
+            logging.error(f"Failed to get header auth headers: {str(e)}")
 
     else:
         mcp_url = agent_config.mcp_url
